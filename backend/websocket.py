@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_sock import Sock
 
-def init_socket(app: Flask):
+def start_backend(app: Flask):
     sock = Sock(app)
 
     @sock.route('/ws/frontend')

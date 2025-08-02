@@ -5,6 +5,7 @@ import os
 import backend.websocket
 import backend.turtles
 import backend.world
+import backend.frontend
 
 load_dotenv()
 app = Flask(__name__, static_url_path='', static_folder='frontend/dist')
@@ -17,26 +18,38 @@ def root():
 
 #Serve wget for turtle
 @app.route('/startup.lua')
-def wget_turtle():
+def wget_startup():
     with open('turtle/startup_template.lua', 'r') as template:
-        #Change WEBSOCKET_URL in template
+        #Change SERVER_URL in template
         file = template.read()
-        ip = os.getenv('SERVER_IP')
-        file = file.replace('WEBSOCKET_URL = \'\'', f'WEBSOCKET_URL = \'{ip}/ws/turtle\'', 1)
+        url = os.getenv('SERVER_URL')
+        file = file.replace('SERVER_URL = \'\'', f'SERVER_URL = \'{url}\'', 1)
+        return file
+    
+@app.route('/remotetutel.lua')
+def wget_remotetutel():
+    with open('turtle/remotetutel_template.lua', 'r') as template:
+        #Change SERVER_URL in template
+        file = template.read()
+        url = os.getenv('SERVER_URL')
+        file = file.replace('SERVER_URL = \'\'', f'SERVER_URL = \'{url}\'', 1)
         return file
 
-#init websocket in backend
-backend.websocket.init_socket(app)
 
+#Start backend (websocket routes)
+backend.websocket.start_backend(app)
+
+#Load stuff into each modules local variables
 def before_start():
     backend.turtles.load()
     backend.world.load()
 
-def after_start():
+#Save stuff from each modules local variables
+def after_stop():
     backend.turtles.save()
     backend.world.save()
 
 if __name__ == '__main__':
     before_start()
     app.run(debug=True, host='0.0.0.0', port=80)
-    after_start()
+    after_stop()
