@@ -5,7 +5,7 @@ import os
 import backend.websocket
 import backend.turtles
 import backend.world
-import backend.frontend
+import backend.frontends
 
 load_dotenv()
 app = Flask(__name__, static_url_path='', static_folder='frontend/dist')
@@ -51,5 +51,5 @@ def after_stop():
 
 if __name__ == '__main__':
     before_start()
-    app.run(debug=True, host='0.0.0.0', port=80)
+    app.run(host='0.0.0.0', port=80)
     after_stop()

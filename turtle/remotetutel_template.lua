@@ -18,16 +18,23 @@ function main()
     end
 
     --connection info
-    websocket.send(textutils.serialiseJSON({protocol='open', tutel_id=tostring(os.computerID())}))
+    websocket.send(textutils.serialiseJSON({type='open', id=tostring(os.computerID())}))
 
     --receive and eval messages
     function process_websocket_message()
 
         msg = websocket.receive()
+
+        if msg == nil then
+            print('Server closed connection, rebooting in 20 seconds')
+            sleep(20)
+            os.reboot()
+        end
+
         msg = textutils.unserialiseJSON(msg)
-        if not msg.protocol then return end
+        if not msg.type then return end
         
-        if msg.protocol == 'eval' and msg.code then
+        if msg.type == 'eval' and msg.code then
             
             func = load(msg.code)
             result = {pcall(func)}
@@ -36,17 +43,17 @@ function main()
             end
 
             function to_json()
-                return textutils.serialiseJSON({protocol='eval', data=result})
+                return textutils.serialiseJSON({type='evalresponse', data=result})
             end
             json_result = {pcall(to_json)}
 
             if not json_result[1] then
-                websocket.send(textutils.serialiseJSON({protocol='eval', data={false, "JSON Error"}}))
+                websocket.send(textutils.serialiseJSON({type='evalresponse', data={false, "JSON Error"}}))
             else
                 websocket.send(json_result[2])
             end
             
-        elseif msg.protocol == 'close' then
+        elseif msg.type == 'close' then
             websocket.close()
             print('Disconnected, rebooting in 20 seconds')
             sleep(20)
