@@ -1,12 +1,17 @@
 from typing import Optional, Literal, Dict
 import json
+from flask_sock import ConnectionClosed
 
 turtles: Dict[str, 'Turtle'] = {}
 
 def ws_connection_handler(ws):
     #Registering process
     global turtles
-    opening_message = json.loads(ws.receive())
+    try:
+        opening_message = json.loads(ws.receive())
+    except ConnectionClosed:
+        print('Some turtle disconnected before ever sending something')
+        return
     message_type = opening_message.get('type')
     if message_type != 'open':
         print(f'Wrong message type! Expected: \'open\' Received: \'{message_type}\'')
@@ -26,8 +31,12 @@ def ws_connection_handler(ws):
     print(f'Registered turtle #{id}')
 
     #Do nothing cuz returning would close the websocket connection
-    while True:
+    while ws.connected:
         pass
+    print(f'Turtle #{id} disconnected')
+    turtle.ws = None
+    turtle.status = turtle.get_status()
+    return
 
 class Turtle:
     def __init__(self, id: str, ws = None, x: Optional[int] = None, y: Optional[int] = None, z: Optional[int] = None, dir: Optional[Literal['n', 'e', 's', 'w']] = None):
