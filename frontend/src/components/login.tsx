@@ -1,14 +1,11 @@
-import {useState} from 'react'
 import {connect} from './websocket.ts'
 import tutel from '/tutel.ico'
 
-export default function LoginPage({setWebsocket} : {setWebsocket: any}){
-    
-    const [loginError, setLoginError] = useState('')
+export default function LoginPage({setWebsocket, errorStuff} : {setWebsocket: any, errorStuff?: {message: string, setMessage: Function}}){
     
     function onSubmit(e: any){
         const password = e.target.value
-        connect(setWebsocket, password, {error: loginError, setError: setLoginError})
+        connect(setWebsocket, password, errorStuff)
     }
     
     return (
@@ -28,7 +25,7 @@ export default function LoginPage({setWebsocket} : {setWebsocket: any}){
                 color: "red"
             }}
             >
-                {loginError}
+                {errorStuff?.message}
             </p>
         </>
         

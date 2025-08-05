@@ -4,12 +4,21 @@ import ControlPage from  './components/control.tsx'
 import './App.css'
 
 function App() {
-  const [websocket, setWebsocket]: [websocket: any, setWebsocket: any] = useState()
+  
+  const [websocket, setWebsocket]: [websocket: any, setWebsocket: Function] = useState()
+  const [errorMessage, setErrorMessage]: [errorMessage: string, setErrorMessage: Function] = useState('')
 
   if (websocket instanceof WebSocket){
-    return <ControlPage websocket={websocket}/>
+    return ( 
+      <ControlPage 
+      websocket={websocket}/>
+    )
   } else {
-    return <LoginPage setWebsocket={setWebsocket}/>
+    return (
+      <LoginPage 
+      setWebsocket={setWebsocket}
+      errorStuff={{message: errorMessage, setMessage: setErrorMessage}}/>
+    )
   }
 }
 
