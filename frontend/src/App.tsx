@@ -5,13 +5,14 @@ import './App.css'
 
 function App() {
   
-  const [websocket, setWebsocket]: [websocket: any, setWebsocket: Function] = useState()
-  const [errorMessage, setErrorMessage]: [errorMessage: string, setErrorMessage: Function] = useState('')
+  const [websocket, setWebsocket]: [WebSocket | undefined, Function] = useState()
+  const [errorMessage, setErrorMessage]: [string | undefined, Function] = useState()
+
+  return <ControlPage/>
 
   if (websocket instanceof WebSocket){
     return ( 
-      <ControlPage 
-      websocket={websocket}/>
+      <ControlPage/>
     )
   } else {
     return (

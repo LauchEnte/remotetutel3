@@ -1,4 +1,4 @@
-export function connect(setWebsocket: any, password: string, errorStuff?: {message: string, setMessage: Function}){
+export function connect(setWebsocket: any, password: string, errorStuff?: {message?: string, setMessage: Function}){
     
     let errorSet = false
     let wasOpen = false
@@ -10,7 +10,7 @@ export function connect(setWebsocket: any, password: string, errorStuff?: {messa
         if (msg.type == 'open' && msg.status == 'success'){
             wasOpen = true
             setWebsocket(ws)
-            errorStuff?.setMessage('')
+            errorStuff?.setMessage(undefined)
             errorSet = false
         } else if (msg.type =='open' && msg.status == 'wrong_password'){
             errorStuff?.setMessage('You entered the wrong password dumbass')
