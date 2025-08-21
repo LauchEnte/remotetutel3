@@ -2,17 +2,20 @@ import {useEffect, useImperativeHandle} from 'react'
 import * as THREE from 'three'
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js'
 
-export default function Renderer(){
+export default function Renderer({ref}: {ref: React.Ref<any>}){
 
     let canvas: HTMLCanvasElement | null
-    
     let scene: THREE.Scene
     let camera: THREE.PerspectiveCamera
     let renderer: THREE.WebGLRenderer
     let controls: OrbitControls
 
+    useImperativeHandle(ref, () => {
+        return {
+        }
+    }, [])
+    
     useEffect(setup, [])
-    console.log('Rerender!')
     
     function setup(){
 
@@ -52,14 +55,14 @@ export default function Renderer(){
 
     return (
         <canvas ref={(ref) => {canvas = ref}} 
-        draggable={false}
-        style={{
-            width: "100svw",
-            height: "100svh",
-            left: "0px",
-            top: "0px",
-            position: "absolute",
-            zIndex: 1,
+            draggable={false}
+            style={{
+                width: "100svw",
+                height: "100svh",
+                left: "0px",
+                top: "0px",
+                position: "absolute",
+                zIndex: 1,
         }}/>
     )
 

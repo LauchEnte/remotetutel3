@@ -1,4 +1,4 @@
-export function connect(setWebsocket: any, password: string, errorStuff?: {message?: string, setMessage: Function}){
+export function connect(setWebsocket: Function, password: string, errorStuff?: {message?: string, setMessage: Function}){
     
     let errorSet = false
     let wasOpen = false

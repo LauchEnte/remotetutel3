@@ -8,7 +8,11 @@ function App() {
   const [websocket, setWebsocket]: [WebSocket | undefined, Function] = useState()
   const [errorMessage, setErrorMessage]: [string | undefined, Function] = useState()
 
-  return <ControlPage/>
+  return (
+      <ControlPage
+        websocket={websocket}
+      />
+    )
 
   if (websocket instanceof WebSocket){
     return ( 
@@ -16,9 +20,10 @@ function App() {
     )
   } else {
     return (
-      <LoginPage 
-      setWebsocket={setWebsocket}
-      errorStuff={{message: errorMessage, setMessage: setErrorMessage}}/>
+      <LoginPage
+        setWebsocket={setWebsocket}
+        errorStuff={{message: errorMessage, setMessage: setErrorMessage}}
+      />
     )
   }
 }
