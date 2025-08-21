@@ -9,13 +9,6 @@ export default function Renderer({ref}: {ref: React.Ref<any>}){
     let camera: THREE.PerspectiveCamera
     let renderer: THREE.WebGLRenderer
     let controls: OrbitControls
-
-    useImperativeHandle(ref, () => {
-        return {
-        }
-    }, [])
-    
-    useEffect(setup, [])
     
     function setup(){
 
@@ -47,10 +40,14 @@ export default function Renderer({ref}: {ref: React.Ref<any>}){
     
         renderer.render( scene, camera )
     
-        
     }
 
-
+    useImperativeHandle(ref, () => {
+        return {
+        }
+    }, [])
+    
+    useEffect(setup, [])
 
 
     return (

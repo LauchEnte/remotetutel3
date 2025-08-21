@@ -7,6 +7,7 @@ export default function Hud({ref}: {ref: React.Ref<any>}){
         }
     }, [])
 
+    
     return (
         <>
         </>

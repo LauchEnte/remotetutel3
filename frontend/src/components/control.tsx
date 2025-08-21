@@ -15,6 +15,7 @@ export default function ControlPage({websocket}: {websocket?: WebSocket}){
 
     if (websocket) websocket.onmessage = webSocketHandler
 
+    
     return (
         <>
            <Hud
