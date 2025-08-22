@@ -1,5 +1,6 @@
 from typing import Optional, Literal, Dict
 import json
+import gevent
 from flask_sock import ConnectionClosed
 
 turtles: Dict[str, 'Turtle'] = {}
@@ -30,9 +31,9 @@ def ws_connection_handler(ws):
         turtle.status = turtle.get_status()
     print(f'Registered turtle #{id}')
 
-    #Do nothing cuz returning would close the websocket connection
+    #Await disconnect
     while ws.connected:
-        pass
+        gevent.sleep(2)
     print(f'Turtle #{id} disconnected')
     turtle.ws = None
     turtle.status = turtle.get_status()

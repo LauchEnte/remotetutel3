@@ -1,4 +1,4 @@
-from flask import Flask, send_from_directory
+from flask import Flask
 from dotenv import load_dotenv
 import os
 
@@ -36,8 +36,8 @@ def wget_remotetutel():
         return file
 
 
-#Start backend (websocket routes)
-backend.websocket.start_backend(app)
+#Backend (websocket routes)
+backend.websocket.route_backend(app)
 
 #Load stuff into each modules local variables
 def before_start():

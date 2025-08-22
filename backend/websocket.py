@@ -3,7 +3,7 @@ from flask_sock import Sock
 import backend.turtles
 import backend.frontends
 
-def start_backend(app: Flask):
+def route_backend(app: Flask):
     sock = Sock(app)
 
     @sock.route('/ws/frontend')

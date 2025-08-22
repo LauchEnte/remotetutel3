@@ -10,12 +10,12 @@ export default function ControlPage({websocket}: {websocket?: WebSocket}){
     const hudRef = useRef(undefined)
     
     function webSocketHandler(event: MessageEvent){
-        
+        console.log(event)
     }
 
     if (websocket) websocket.onmessage = webSocketHandler
 
-    
+
     return (
         <>
            <Hud

@@ -11,4 +11,3 @@ echo installing python dependencies
 call pip install -r requirements.txt
 call deactivate
 echo setup done
-pause
