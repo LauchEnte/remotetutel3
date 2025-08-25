@@ -1,25 +1,16 @@
-import { useState } from 'react'
-import LoginPage from './components/login.tsx'
-import ControlPage from  './components/control.tsx'
+import React from 'react'
+import {LoginPage} from './components/LoginPage.tsx'
+import {RemotetutelPage} from './components/RemotetutelPage.tsx'
 import './App.css'
 
-function App() {
-  
-  const [websocket, setWebsocket]: [WebSocket | undefined, Function] = useState()
-  const [errorMessage, setErrorMessage]: [string | undefined, Function] = useState()
+export default function App(){
 
-  if (websocket instanceof WebSocket){
-    return ( 
-      <ControlPage/>
-    )
-  } else {
-    return (
-      <LoginPage
-        setWebsocket={setWebsocket}
-        errorStuff={{message: errorMessage, setMessage: setErrorMessage}}
-      />
-    )
-  }
+    const [websocket, setWebsocket] = React.useState<WebSocket | null>(null)
+
+    if (websocket instanceof WebSocket) {
+        return <RemotetutelPage websocket={websocket}/>
+    } else {
+        return <LoginPage setWebsocket={setWebsocket}/>
+    }
+
 }
-
-export default App
