@@ -1,9 +1,9 @@
-import {useState, useContext} from 'react'
+import React from 'react'
 import logo from '/tutel.ico'
 
 export function LoginPage({setWebsocket}: {setWebsocket: (ws: WebSocket | null) => void}){
 
-    const [error, setError] = useState<string | null>(null)
+    const [error, setError] = React.useState<string | null>(null)
 
     function login(password: string){
 

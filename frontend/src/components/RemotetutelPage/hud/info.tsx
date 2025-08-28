@@ -7,6 +7,8 @@ export function Info(){
     const turtles = shared.turtles
     const turtle = shared.turtle
 
+    console.log('Info render')
+
     return (
         <div
             style={{
@@ -24,7 +26,6 @@ export function Info(){
                 onChange={(e: any) => {
                     shared.turtle = turtles.get(e.target.value)!
                     shared.view!.setTargetTurtle(shared.turtle)
-                    shared.hud!.update()
                 }}
             >
                 {[<option disabled={turtle != null} key=''>-- select a Tutel --</option>].concat(
@@ -33,16 +34,14 @@ export function Info(){
                     }))
                 }
             </select>
-            {turtle ? 
-            <p
+            {turtle ? <p
                 style={{
                     fontSize: 'small',
                     margin: 0
                 }}
             >
                 🌎 {turtle.pos.x} {turtle.pos.y} {turtle.pos.z} {['north', 'east', 'south', 'west'][turtle.pos.dir!]}
-            </p> 
-            : null}
+            </p> : null}
         </div>
     )
 }

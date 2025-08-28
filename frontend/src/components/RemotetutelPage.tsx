@@ -1,6 +1,6 @@
 import React from 'react'
 import { View, MyView } from './RemotetutelPage/view'
-import { Hud, MyHud } from './RemotetutelPage/hud'
+import { Hud } from './RemotetutelPage/hud'
 
 export class Position {
     x: number
@@ -46,8 +46,9 @@ interface sendableObject extends Record<string, any>{
 export class MyWebsocket {
     websocket: WebSocket
 
-    constructor(websocket: WebSocket){
+    constructor(websocket: WebSocket, messageHandler: (ev: MessageEvent) => void){
         this.websocket = websocket
+        this.websocket.onmessage = messageHandler
     }
 
     sendFormatted(obj: sendableObject){
@@ -60,8 +61,8 @@ interface shared {
     turtles: Map<string, Turtle> //key: id
     turtle: Turtle | null
     blocks: Map<string, Block> //key: pos as 'x/y/z'
-    view?: MyView
-    hud?: MyHud
+    view?: MyView,
+    update: () => void
 }
 
 //everything that needs to be shared accross components further down
@@ -69,20 +70,22 @@ export const SharedContext = React.createContext<shared>(undefined!)
 
 export function RemotetutelPage({websocket}: {websocket: WebSocket}){
 
+    
+    const [, forceUpdate] = React.useReducer(o => o, [])
+    
     const shared = React.useRef<shared>({
-        websocket: new MyWebsocket(websocket),
+        websocket: new MyWebsocket(websocket, websocketMessageHandler),
         turtles: new Map<string, Turtle>(), //key: id
         turtle: null,
-        blocks: new Map<string, Block>() //key: position as 'x/y/z'
+        blocks: new Map<string, Block>(), //key: position as 'x/y/z'
+        update: forceUpdate
     }).current
+    
+    function websocketMessageHandler(e: MessageEvent){
+        console.log(e)
+    }
 
-    shared.turtles.set('0', new Turtle('0', 'online', new Position(0, 0, 0, 0)))
-    shared.turtles.set('1', new Turtle('1', 'offline', new Position(1, 1, 1, 1)))
-    shared.turtles.set('2', new Turtle('2', 'online', new Position(2, 2, 2, 2)))
-
-    React.useEffect(() => {
-        shared.view?.addTurtle(shared.turtles.get('0')!)
-    })
+    console.log('RemotetutelPage render')
 
     return (
 
