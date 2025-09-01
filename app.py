@@ -4,7 +4,7 @@ import os
 
 import backend.websocket
 import backend.turtles
-import backend.world
+import backend.blocks
 import backend.frontends
 
 load_dotenv()
@@ -42,12 +42,12 @@ backend.websocket.route_backend(app)
 #Load stuff into each modules local variables
 def before_start():
     backend.turtles.load()
-    backend.world.load()
+    backend.blocks.load()
 
 #Save stuff from each modules local variables
 def after_stop():
     backend.turtles.save()
-    backend.world.save()
+    backend.blocks.save()
 
 if __name__ == '__main__':
     before_start()

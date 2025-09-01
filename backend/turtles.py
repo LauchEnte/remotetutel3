@@ -2,6 +2,7 @@ from typing import Optional, Literal, Dict
 import json
 import gevent
 from flask_sock import ConnectionClosed
+from backend.util import Position
 
 turtles: Dict[str, 'Turtle'] = {}
 
@@ -40,17 +41,14 @@ def ws_connection_handler(ws):
     return
 
 class Turtle:
-    def __init__(self, id: str, ws = None, x: Optional[int] = None, y: Optional[int] = None, z: Optional[int] = None, dir: Optional[Literal['n', 'e', 's', 'w']] = None):
+    def __init__(self, id: str, ws = None, pos: Position = None):
         self.id = id
         self.ws = ws
-        self.x = x
-        self.y = y
-        self.z = z
-        self.dir = dir
+        self.pos = pos
         self.status = self.get_status()
 
     def get_status(self) -> Literal['unknown_position', 'online', 'offline']:
-        if None in [self.x, self.y, self.z, self.dir]:
+        if self.pos == None:
             return 'unknown_position'
         elif self.ws and self.ws.connected:
             return 'online'
@@ -75,10 +73,25 @@ class Turtle:
 
 def load(path: str = 'saves/turtles.json'):
     global turtles
-    print('Loading turtles save file')
-    ...
+    try:
+        with open(path, 'r') as file:
+            turtles_dict: dict = json.load(file)
+        for turtle_dict in turtles_dict.values():
+            turtles[turtle_dict['id']] = Turtle(turtle_dict['id'], None, turtle_dict.get('pos', False) and Position(**turtle_dict.get('pos')))
+        print('Loading turtles save file')
+    except FileNotFoundError:
+        print('No turtles save file found')
 
 def save(path: str = 'saves/turtles.json'):
     global turtles
     print('Saving turtles')
-    ...
+    turtles_dict = {}
+    for turtle in turtles.values():
+        id = turtle.id
+        if turtle.pos:
+            pos = {'x': turtle.pos.x, 'y': turtle.pos.y, 'z': turtle.pos.z, 'dir': turtle.pos.dir}
+        else:
+            pos = None
+        turtles_dict[id] = {'id': id, 'pos': pos}
+    with open(path, 'w') as file:
+        json.dump(turtles_dict, file)
