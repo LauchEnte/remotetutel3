@@ -2,7 +2,6 @@ from typing import Optional, Literal, Dict
 import json
 import gevent
 from flask_sock import ConnectionClosed
-from backend.util import Position
 
 turtles: Dict[str, 'Turtle'] = {}
 
@@ -41,14 +40,50 @@ def ws_connection_handler(ws):
     return
 
 class Turtle:
-    def __init__(self, id: str, ws = None, pos: Position = None):
+    def __init__(self, id: str, x: Optional[int] = None, y: Optional[int] = None, z: Optional[int] = None, dir: Optional[Literal[0, 1, 2, 3]] = None, ws = None):
         self.id = id
         self.ws = ws
-        self.pos = pos
+        self.x = x
+        self.y = y
+        self.z = z
+        self.dir = dir
         self.status = self.get_status()
 
+    def turn1math(self, dir: Literal['left', 'right']) -> None:
+        if dir == 'right':
+            self.dir = (self.dir + 1) % 4
+        else:
+            self.dir = (self.dir + 3) % 4
+
+    def go1math(self, dir: Literal['forward', 'back, up, down']) -> None:
+        match dir:
+            case 'up':
+                self.y += 1
+            case 'down':
+                self.y -= 1
+            case 'forward':
+                match self.dir:
+                    case 0:
+                        self.z -= 1
+                    case 1:
+                        self.x += 1
+                    case 2:
+                        self.z += 1
+                    case 3:
+                        self.x -= 1
+            case 'back':
+                match self.dir:
+                    case 0:
+                        self.z += 1
+                    case 1:
+                        self.x -= 1
+                    case 2:
+                        self.z -= 1
+                    case 3:
+                        self.x += 1
+
     def get_status(self) -> Literal['unknown_position', 'online', 'offline']:
-        if self.pos == None:
+        if None in [self.x, self.y, self.z, self.dir]:
             return 'unknown_position'
         elif self.ws and self.ws.connected:
             return 'online'
@@ -77,7 +112,7 @@ def load(path: str = 'saves/turtles.json'):
         with open(path, 'r') as file:
             turtles_dict: dict = json.load(file)
         for turtle_dict in turtles_dict.values():
-            turtles[turtle_dict['id']] = Turtle(turtle_dict['id'], None, turtle_dict.get('pos', False) and Position(**turtle_dict.get('pos')))
+            turtles[turtle_dict['id']] = Turtle(**turtle_dict)
         print('Loading turtles save file')
     except FileNotFoundError:
         print('No turtles save file found')
@@ -87,11 +122,6 @@ def save(path: str = 'saves/turtles.json'):
     print('Saving turtles')
     turtles_dict = {}
     for turtle in turtles.values():
-        id = turtle.id
-        if turtle.pos:
-            pos = {'x': turtle.pos.x, 'y': turtle.pos.y, 'z': turtle.pos.z, 'dir': turtle.pos.dir}
-        else:
-            pos = None
-        turtles_dict[id] = {'id': id, 'pos': pos}
+        turtles_dict[turtle.id] = {'id': turtle.id, 'x': turtle.x, 'y': turtle.y, 'z': turtle.z}
     with open(path, 'w') as file:
         json.dump(turtles_dict, file)
