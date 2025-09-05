@@ -37,7 +37,7 @@ def wget_remotetutel():
 
 
 #Backend (websocket routes)
-backend.websocket.route_backend(app)
+backend.websocket.route_backend(app, backend.blocks.blocks, backend.turtles.turtles)
 
 #Load stuff into each modules local variables
 def before_start():

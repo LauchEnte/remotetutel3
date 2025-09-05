@@ -2,13 +2,17 @@ import React from 'react'
 import { View, MyView } from './RemotetutelPage/view'
 import { Hud } from './RemotetutelPage/hud'
 
-export class Position {
-    x: number
-    y: number
-    z: number
+export class Turtle {
+    id: string
+    status: string
+    x?: number
+    y?: number
+    z?: number
     dir?: number
 
-    constructor(x: number, y: number, z: number, dir?: number){
+    constructor(id: string, status: string, x?: number, y?: number, z?: number, dir?: number){
+        this.id = id
+        this.status = status
         this.x = x
         this.y = y
         this.z = z
@@ -16,31 +20,27 @@ export class Position {
     }
 
 }
-export class Turtle {
-    id: string
-    status: string
-    pos: Position
-
-    constructor(id: string, status: string, pos: Position){
-        this.id = id
-        this.status = status
-        this.pos = pos
-    }
-
-}
 export class Block {
     name: string
-    pos: Position
+    x?: number
+    y?: number
+    z?: number
 
-    constructor(name: string, pos: Position){
+    constructor(name: string, x: number, y: number, z: number){
         this.name = name
-        this.pos = pos
+        this.x = x
+        this.y = y
+        this.z = z
     }
 }
 
 interface sendableObject extends Record<string, any>{
     type: string
-    turtleId: string
+    turtleId?: string
+}
+
+interface receiveableObject extends Record<string, any>{
+    type: string
 }
 
 export class MyWebsocket {
@@ -69,23 +69,48 @@ interface shared {
 export const SharedContext = React.createContext<shared>(undefined!)
 
 export function RemotetutelPage({websocket}: {websocket: WebSocket}){
-
     
-    const [, forceUpdate] = React.useReducer(o => o, [])
+    const [updater, forceUpdate] = React.useReducer(o => o + 1, 0)
     
     const shared = React.useRef<shared>({
-        websocket: new MyWebsocket(websocket, websocketMessageHandler),
+        websocket: new MyWebsocket(websocket, (event) => {websocketMessageHandler(shared, JSON.parse(event.data))}),
         turtles: new Map<string, Turtle>(), //key: id
         turtle: null,
         blocks: new Map<string, Block>(), //key: position as 'x/y/z'
         update: forceUpdate
     }).current
     
-    function websocketMessageHandler(e: MessageEvent){
-        console.log(e)
+    //only run at the very first rerender
+    React.useEffect(() => {
+        shared.websocket.sendFormatted({type: 'getAll'})
+    }, [])
+    
+    function websocketMessageHandler(shared: shared, message: receiveableObject){
+        switch (message.type){
+            case 'blocks':
+                Object.entries(message.blocks).forEach(([key, value]) => {
+                    const b = value as {name: string, x: number, y: number, z: number}
+                    const block = new Block(b.name, b.x, b.y, b.z)
+                    shared.blocks.set(key, block)
+                    shared.view!.addBlock(block)
+                })
+                break
+            case 'turtles':
+                Object.entries(message.turtles).forEach(([key, value]) => {
+                    const t = value as {id: string, x?: number, y?: number, z?: number, dir?: number, status: string}
+                    const turtle = new Turtle(t.id, t.status, t.x, t.y, t.z, t.dir)
+                    shared.turtles.set(key, turtle)
+                    shared.view?.addTurtle(turtle)
+                    if (turtle.id == shared.turtle?.id){
+                        shared.turtle = turtle
+                        shared.view?.setTargetTurtle(turtle)
+                    }
+                    forceUpdate()
+                })
+        }
     }
 
-    console.log('RemotetutelPage render')
+    console.log('RemotetutelPage render', updater)
 
     return (
 

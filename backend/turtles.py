@@ -122,6 +122,6 @@ def save(path: str = 'saves/turtles.json'):
     print('Saving turtles')
     turtles_dict = {}
     for turtle in turtles.values():
-        turtles_dict[turtle.id] = {'id': turtle.id, 'x': turtle.x, 'y': turtle.y, 'z': turtle.z}
+        turtles_dict[turtle.id] = {'id': turtle.id, 'x': turtle.x, 'y': turtle.y, 'z': turtle.z, 'dir': turtle.dir}
     with open(path, 'w') as file:
         json.dump(turtles_dict, file)

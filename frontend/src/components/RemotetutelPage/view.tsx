@@ -1,7 +1,7 @@
 import React from 'react'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
-import { SharedContext, Turtle, Block, Position } from '../RemotetutelPage'
+import { SharedContext, Turtle, Block } from '../RemotetutelPage'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 
 export class MyView {
@@ -33,7 +33,7 @@ export class MyView {
     }
 
     setTargetTurtle(turtle: Turtle){
-        const newTarget = new THREE.Vector3(turtle.pos.x, turtle.pos.y, turtle.pos.z)
+        const newTarget = new THREE.Vector3(turtle.x, turtle.y, turtle.z)
         const oldTarget = this.controls.target
         const diff = new THREE.Vector3().subVectors(newTarget, oldTarget)
 
@@ -44,7 +44,11 @@ export class MyView {
     }
 
     addTurtle(turtle: Turtle){
-        const pos = new THREE.Vector3(turtle.pos.x, turtle.pos.y, turtle.pos.z)
+        const oldModel = this.scene.getObjectByName(turtle.id)
+        if (!(oldModel == undefined)) this.scene.remove(oldModel)
+
+        if (turtle.status == 'unknown_position') return
+        const pos = new THREE.Vector3(turtle.x, turtle.y, turtle.z)
         this.loader.load('src/assets/turtle/turtle.glb', (gltf) => {
             const model = gltf.scene.children[0]
             model.position.copy(pos)
@@ -62,7 +66,7 @@ export class MyView {
     }
 
     addBlock(block: Block){
-        const pos = new THREE.Vector3(block.pos.x, block.pos.y, block.pos.z)
+        const pos = new THREE.Vector3(block.x, block.y, block.z)
         const hue = this.hashCode(block.name) % 500
         const cube = new THREE.Mesh(
             new THREE.BoxGeometry(1, 1, 1),
@@ -74,8 +78,8 @@ export class MyView {
         this.render()
     }
 
-    removeBlock(pos: Position){
-        const model = this.scene.getObjectByName(`${pos.x}/${pos.y}/${pos.z}`)
+    removeBlock(key: string){
+        const model = this.scene.getObjectByName(key)
         if (model) this.scene.remove(model)
         this.render()
     }
